@@ -3,8 +3,6 @@ if app.all.Value
     app.inf_vs_t = sum(app.DATA(:,10:end),1);
     app.dth_vs_t = sum(app.DATA_Deaths(:,10:end),1);
 elseif app.specific.Value
-    app.Countries
-    app.countries.Value
     I = ismember(app.Countries,app.countries.Value);
     app.inf_vs_t = sum(app.DATA(I,10:end),1);
     app.dth_vs_t = sum(app.DATA_Deaths(I,10:end),1);
