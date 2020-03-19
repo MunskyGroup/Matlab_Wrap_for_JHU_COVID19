@@ -7,7 +7,7 @@ while exist(['Pandemic_',num2str(k),'.avi'],'file')
     k=k+1;
 end
 
-cmap = colormap('hsv');
+cmap = colormap('jet');
 
 vidObj = VideoWriter(['Pandemic_',num2str(k),'.avi']);
 open(vidObj);

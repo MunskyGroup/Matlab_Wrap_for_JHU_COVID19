@@ -40,7 +40,7 @@ I = floor(log2(DATA(:,j)));
 app.TimeSlider.Limits = [-Nt+1,0];
 
 %% change colormap
-cmap = colormap('hsv');
+cmap = colormap('jet');
 K = floor(linspace(1,size(cmap,1),floor(max(log2(DATA(:))))));
 
 %%
@@ -50,6 +50,8 @@ end
 
 copyobj(h.Children, app.map);  % Copy all of the axis' children to your app axis
 delete(h.Parent) % get rid of the figure created by worldmap()
+
+colormap(app.map,'jet')
 
 hcb = colorbar(app.map,'southoutside');
 set(get(hcb,'Xlabel'),'String','Size of infection')
