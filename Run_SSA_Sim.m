@@ -34,10 +34,15 @@ S = [-1,1,0,0,0,0,0;...% inf
      kd*x(5)]; 
  
  TAarray = linspace(0,500,501);
- [X_Array] = run_ssa(S,prop,x0,TAarray);
  
-%  plot(app.ssa_results,TAarray,X_Array,'linewidth',3);
-%  legend(app.ssa_results,{'susceptible','asymptomatic','symptomatic','hospitalized','recovered','deceased'}); 
+ if app.ssa.Value % SSA
+     [X_Array] = run_ssa(S,prop,x0,TAarray);
+ else  % ODE
+     fn = @(~,x)S*prop(x);
+     [~,X_Array] = ode45(fn,TAarray,x0);
+     X_Array = X_Array';
+ end
+     
  plot(app.ssa_results,TAarray,X_Array([2,3,4,5,7],:)/sum(x0),'linewidth',3);
  set(app.ssa_results,'ylim',[0,0.15])
  legend(app.ssa_results,{'nonifectuous','asymptomatic','symptomatic','hospitalized','deceased'});

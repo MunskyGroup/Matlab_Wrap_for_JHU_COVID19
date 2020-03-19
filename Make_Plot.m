@@ -4,6 +4,7 @@ if app.all.Value
     app.dth_vs_t = sum(app.DATA_Deaths(:,10:end),1);
 elseif app.specific.Value
     if strcmp(app.states.Value,'ALL')
+        app.inf_vs_t =[];app.dth_vs_t =[];
         for j=1:length(app.countries.Value)
             I = ismember(app.Countries,app.countries.Value{j});
             app.inf_vs_t(j,:) = sum(app.DATA(I,:),1);
