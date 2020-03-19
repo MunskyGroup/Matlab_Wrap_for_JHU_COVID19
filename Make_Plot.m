@@ -1,4 +1,8 @@
 function Make_Plot(app)
+
+app.countries.Value = sort(app.countries.Value);
+app.states.Value = sort(app.states.Value);
+
 if app.all.Value
     app.inf_vs_t = sum(app.DATA(:,10:end),1);
     app.dth_vs_t = sum(app.DATA_Deaths(:,10:end),1);
@@ -11,10 +15,12 @@ elseif app.specific.Value
             app.dth_vs_t(j,:) = sum(app.DATA_Deaths(I,:),1);
         end
     else
-        I = ismember(app.Countries,app.countries.Value)&...
-            ismember(app.States,app.states.Value);
-        app.inf_vs_t = app.DATA(I,:);
-        app.dth_vs_t = app.DATA_Deaths(I,:);
+        app.inf_vs_t=[];app.dth_vs_t =[];
+        for j=1:length(app.states.Value)
+            I = ismember(app.States,app.states.Value{j});
+            app.inf_vs_t(j,:) = app.DATA(I,:);
+            app.dth_vs_t(j,:) = app.DATA_Deaths(I,:);
+        end
     end
 end
 hold(app.ax_infections,'off')
