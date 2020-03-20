@@ -61,8 +61,7 @@ for i=1:max(I)
 end
 
 copyobj(h.Children, app.map);  % Copy all of the axis' children to app axis
-delete(h.Parent) % get rid of the figure created by worldmap()
-
+% delete(h.Parent) % get rid of the figure created by worldmap()
 % Add colorbar for scale.
 colormap(app.map,'jet')
 hcb = colorbar(app.map,'southoutside');
@@ -71,4 +70,12 @@ set(hcb,'Ticks',linspace(0,1,length(K)),'TickLabels',2.^[1:length(K)])
 
 app.map.Title.String = ['Map of Pandemic on ',app.dates{j}];
 
+figure(2)
+h=gca;
+copyobj(app.map.Children,h);
+colormap(app.map,'jet')
+hcb2 = colorbar('southoutside');
+set(get(hcb2,'Xlabel'),'String','Size of infection')
+set(hcb2,'Ticks',linspace(0,1,length(K)),'TickLabels',2.^[1:length(K)])
+saveas(h,['screenshots/',app.RegionDropDown.Value],'png')
 
