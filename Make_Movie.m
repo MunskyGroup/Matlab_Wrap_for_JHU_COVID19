@@ -20,7 +20,8 @@ Long = app.Long;
 % Define color map
 cmap = colormap('jet');
 K = floor(linspace(1,size(cmap,1),max(log2(DATA(:)))));
-    
+ 
+
 app.TimeSlider.Limits = [-Nt+1,0];
 
 % Iterate through time
@@ -55,6 +56,8 @@ for j = 1:Nt
             plotm(coastlat, coastlon);
             geoshow('landareas.shp', 'FaceColor', [0.15 0.5 0.15])
     end
+    mxI = log2(max(DATA(:)));
+    mksize = linspace(4,30,mxI);
 
     % Bin data for plotting
     I = floor(log2(DATA(:,j)));
@@ -62,7 +65,7 @@ for j = 1:Nt
     % Add points for all states/regions
     if max(I)>=1
         for i=1:max(I)
-            geoshow(Lat(I==i),Long(I==i),'DisplayType', 'Point', 'Marker', 'o', 'Color', cmap(K(i),:),'MarkerFaceColor',cmap(K(i),:),'MarkerSize',i)
+            geoshow(Lat(I==i),Long(I==i),'DisplayType', 'Point', 'Marker', 'o', 'Color', cmap(K(i),:),'MarkerFaceColor',cmap(K(i),:),'MarkerSize',mksize(i))
         end
     end
     
@@ -72,7 +75,7 @@ for j = 1:Nt
     % Add colorbar for scale.
     hcb = colorbar('southoutside');
     set(get(hcb,'Xlabel'),'String','Size of infection')
-    set(hcb,'Ticks',linspace(0,1,length(K(1:2:end))),'TickLabels',2.^[1:2:length(K)])
+    set(hcb,'Ticks',linspace(0,1,length(K)),'TickLabels',2.^[1:length(K)])
     
     drawnow
     currFrame = getframe(gcf);

@@ -47,6 +47,8 @@ end
 
 % Bin data for plotting
 I = floor(log2(DATA(:,j)));
+mxI = log2(max(DATA(:)));
+mksize = linspace(4,30,mxI);
 app.TimeSlider.Limits = [-Nt+1,0];
 
 %% change colormap
@@ -55,7 +57,7 @@ K = floor(linspace(1,size(cmap,1),floor(max(log2(DATA(:))))));
 
 % Add points for all states/regions
 for i=1:max(I)
-    geoshow(Lat(I==i),Long(I==i),'DisplayType', 'Point', 'Marker', 'o', 'Color',cmap(K(i),:),'MarkerFaceColor',cmap(K(i),:),'MarkerSize',i)
+    geoshow(Lat(I==i),Long(I==i),'DisplayType', 'Point', 'Marker', 'o', 'Color',cmap(K(i),:),'MarkerFaceColor',cmap(K(i),:),'MarkerSize',mksize(i))
 end
 
 copyobj(h.Children, app.map);  % Copy all of the axis' children to app axis
@@ -65,7 +67,7 @@ delete(h.Parent) % get rid of the figure created by worldmap()
 colormap(app.map,'jet')
 hcb = colorbar(app.map,'southoutside');
 set(get(hcb,'Xlabel'),'String','Size of infection')
-set(hcb,'Ticks',linspace(0,1,length(K(1:2:end))),'TickLabels',2.^[1:2:length(K)])
+set(hcb,'Ticks',linspace(0,1,length(K)),'TickLabels',2.^[1:length(K)])
 
 app.map.Title.String = ['Map of Pandemic on ',app.dates{j}];
 
