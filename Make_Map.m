@@ -1,4 +1,8 @@
 function Make_Map(app)
+% Make_Map(app)
+% This function makes a map of the JHU infection data for the 
+% COVID19_Matlab_App (app).
+
 close all
 cla(app.map);
 Nt = size(app.DATA,2);
@@ -6,11 +10,17 @@ j = round(app.TimeSlider.Value)+Nt;
 DATA = app.DATA;
 Lat = app.Lat;
 Long = app.Long;
+
+app.TimeSlider.MajorTicks = [-Nt+1:5:0];
+app.TimeSlider.MinorTicks = [-Nt+1:1:0];
+app.TimeSlider.MajorTickLabels = {app.dates{1:5:end}};
+
+
+% Create base map for World, US, or Europe
 switch app.RegionDropDown.Value
     case 'World'
         h = worldmap('World');  % Store the output handle!
         load coastlines
-%         [latcells, loncells] = polysplit(coastlat, coastlon);
         plotm(coastlat, coastlon);
         geoshow('landareas.shp', 'FaceColor', [0.15 0.5 0.15])
     case 'US'
@@ -31,11 +41,11 @@ switch app.RegionDropDown.Value
 case 'Europe'
     h = worldmap('Europe');  % Store the output handle!
     load coastlines
-    %         [latcells, loncells] = polysplit(coastlat, coastlon);
     plotm(coastlat, coastlon);
     geoshow('landareas.shp', 'FaceColor', [0.15 0.5 0.15])
 end
 
+% Bin data for plotting
 I = floor(log2(DATA(:,j)));
 app.TimeSlider.Limits = [-Nt+1,0];
 
@@ -43,19 +53,20 @@ app.TimeSlider.Limits = [-Nt+1,0];
 cmap = colormap('jet');
 K = floor(linspace(1,size(cmap,1),floor(max(log2(DATA(:))))));
 
-%%
+% Add points for all states/regions
 for i=1:max(I)
     geoshow(Lat(I==i),Long(I==i),'DisplayType', 'Point', 'Marker', 'o', 'Color',cmap(K(i),:),'MarkerFaceColor',cmap(K(i),:),'MarkerSize',i)
 end
 
-copyobj(h.Children, app.map);  % Copy all of the axis' children to your app axis
+copyobj(h.Children, app.map);  % Copy all of the axis' children to app axis
 delete(h.Parent) % get rid of the figure created by worldmap()
 
+% Add colorbar for scale.
 colormap(app.map,'jet')
-
 hcb = colorbar(app.map,'southoutside');
 set(get(hcb,'Xlabel'),'String','Size of infection')
 set(hcb,'Ticks',linspace(0,1,length(K(1:2:end))),'TickLabels',2.^[1:2:length(K)])
 
+app.map.Title.String = ['Map of Pandemic on ',app.dates{j}];
 
 
