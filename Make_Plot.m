@@ -20,7 +20,14 @@ elseif app.specific.Value  % Specific Countries or states.
             I = ismember(app.Countries,app.countries.Value{j});
             app.inf_vs_t(j,:) = sum(app.DATA(I,:),1);
             app.dth_vs_t(j,:) = sum(app.DATA_Deaths(I,:),1);
-            pop(j) = sum(app.Pop_Data(I),1);
+            pop(j) = sum(app.Pop_Data(I),1,'omitnan');
+            if pop(j)==0
+                try
+                    I = ismember(app.Country_Pop.Country_Names,app.countries.Value{j});
+                    pop(j) = app.Country_Pop.Country_Pops(I);
+                catch
+                end
+            end
         end
     else
         pop = [];
@@ -32,6 +39,7 @@ elseif app.specific.Value  % Specific Countries or states.
             pop(j) = app.Pop_Data(I);
         end
     end
+    pop(pop==0)=NaN;
 end
 
 if app.rel.Value

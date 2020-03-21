@@ -1,10 +1,11 @@
 %% Auto-Update Maps
 try
     A = COVID19_Matlab_App;
-    TMP = {'World','US','Europe'};
-    for i=1:3
+    TMP = {'World','US','US Per 10k','Europe'};
+    for i=1:4
         A.RegionDropDown.Value = TMP{i};
         cb = get(eval('A.RegionDropDown'),'ValueChangedFcn'); cb(A,[]);
+        cb = get(eval('A.GenerateMovieButton'),'ButtonPushedFcn'); cb(A,[]);
     end
 catch ME
     disp('Map Update Failed');

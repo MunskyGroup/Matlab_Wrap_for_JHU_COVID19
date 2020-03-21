@@ -1,6 +1,6 @@
 function Make_Movie(app)
 % Make_Movie(app)
-% This function makes a movie of the spatial JHU data selected in the 
+% This function makes a movie of the spatial JHU data selected in the
 % COVID19_Matlab_App (app).
 
 Nt = size(app.DATA,2);
@@ -16,11 +16,6 @@ open(vidObj);
 DATA = app.DATA;
 Lat = app.Lat;
 Long = app.Long;
-
-% Define color map
-cmap = colormap('jet');
-K = floor(linspace(1,size(cmap,1),max(log2(DATA(:)))));
- 
 
 app.TimeSlider.Limits = [-Nt+1,0];
 
@@ -50,17 +45,46 @@ for j = 1:Nt
             DATA = app.DATA(J,:);
             Lat = app.Lat(J,:);
             Long = app.Long(J,:);
-        case 'Europe'
+        case 'US Per 10k'
+            h = usamap('conus');
+            states = shaperead('usastatelo', 'UseGeoCoords', true,...
+                'Selector',...
+                {@(name) ~any(strcmp(name,{'Alaska','Hawaii'})), 'Name'});
+            rng(0)
+            faceColors = makesymbolspec('Polygon',...
+                {'INDEX', [1 numel(states)], 'FaceColor', ...
+                polcmap(numel(states))}); %NOTE - colors are random
+            geoshow(h, states, 'DisplayType', 'polygon', ...
+                'SymbolSpec', faceColors)
+            J = strcmp(app.Countries,'US')&~strcmp(app.Countries,'Alaska')&~strcmp(app.Countries,'Hawaii')...
+                &~contains(app.Countries,'Princess');
+            DATA = app.DATA(J,:)./app.Pop_Data(J)*1e4;
+            Lat = app.Lat(J,:);
+            Long = app.Long(J,:);        case 'Europe'
             h = worldmap('Europe');  % Store the output handle!
             load coastlines
             plotm(coastlat, coastlon);
             geoshow('landareas.shp', 'FaceColor', [0.15 0.5 0.15])
     end
-    mxI = log2(max(DATA(:)));
-    mksize = linspace(4,30,mxI);
-
     % Bin data for plotting
-    I = floor(log2(DATA(:,j)));
+    cmap = colormap('jet');
+    if ~strcmp(app.RegionDropDown.Value,'US Per 10k')
+        I = floor(log2(DATA(:,j)));
+        mxI = log2(max(DATA(:)));
+        mksize = linspace(4,30,mxI);
+        app.TimeSlider.Limits = [-Nt+1,0];
+        K = floor(linspace(1,size(cmap,1),floor(max(log2(DATA(:))))));
+        ticklabs = 2.^[1:length(K)];
+        cblab = 'Size of infection';
+    else
+        I = floor(log2(DATA(:,j))+5);
+        mxI = log2(max(DATA(:)))+5;
+        mksize = linspace(4,30,mxI);
+        app.TimeSlider.Limits = [-Nt+1,0];
+        K = floor(linspace(1,size(cmap,1),floor(max(log2(DATA(:)))+5)));
+        ticklabs = 2.^([1:length(K)]-5);
+        cblab = 'Size of infection per 10k';
+    end
     
     % Add points for all states/regions
     if max(I)>=1
@@ -73,9 +97,10 @@ for j = 1:Nt
     title(app.dates{j})
     
     % Add colorbar for scale.
-    hcb = colorbar('southoutside');
-    set(get(hcb,'Xlabel'),'String','Size of infection')
-    set(hcb,'Ticks',linspace(0,1,length(K)),'TickLabels',2.^[1:length(K)])
+    hcb = colorbar('east');
+    hcb.Position([2,4]) = [0.6,0.3];
+    set(get(hcb,'Xlabel'),'String',cblab)
+    set(hcb,'Ticks',linspace(0,1,length(K)),'TickLabels',ticklabs)
     
     drawnow
     currFrame = getframe(gcf);

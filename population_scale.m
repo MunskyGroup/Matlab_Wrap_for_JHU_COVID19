@@ -29,3 +29,5 @@ for i = 1:length(app.States)
     end
 end
 app.Pop_Data = POP;
+app.Country_Pop.Country_Names = Country_Names;
+app.Country_Pop.Country_Pops =Country_Pops;
