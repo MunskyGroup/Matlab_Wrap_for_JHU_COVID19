@@ -11,23 +11,72 @@ app.states.Value = sort(app.states.Value);
 if app.all.Value  % All at once
     app.inf_vs_t = sum(app.DATA(:,10:end),1);
     app.dth_vs_t = sum(app.DATA_Deaths(:,10:end),1);
+    app.abs.Value=1;
 elseif app.specific.Value  % Specific Countries or states.
     if strcmp(app.states.Value,'ALL') % All states in chosen country/counties.
+        pop = [];
         app.inf_vs_t =[];app.dth_vs_t =[];
         for j=1:length(app.countries.Value) % separate out specific countries.
             I = ismember(app.Countries,app.countries.Value{j});
             app.inf_vs_t(j,:) = sum(app.DATA(I,:),1);
             app.dth_vs_t(j,:) = sum(app.DATA_Deaths(I,:),1);
+            pop(j) = sum(app.Pop_Data(I),1);
         end
     else
+        pop = [];
         app.inf_vs_t=[];app.dth_vs_t =[];  % Separate out specific states/regions
         for j=1:length(app.states.Value)
             I = ismember(app.States,app.states.Value{j});
             app.inf_vs_t(j,:) = app.DATA(I,:);
             app.dth_vs_t(j,:) = app.DATA_Deaths(I,:);
+            pop(j) = app.Pop_Data(I);
         end
     end
 end
+
+if app.rel.Value
+    if isnan(sum(pop))
+        app.abs.Value=1;
+        app.ax_infections.YLabel.String = 'Infections (absolute number)';
+        app.ax_deaths.YLabel.String = 'Deaths (absolute number)';
+    else
+        app.inf_vs_t=app.inf_vs_t./pop'*1e4;
+        app.dth_vs_t=app.dth_vs_t./pop'*1e4;
+        app.ax_infections.YLabel.String = 'Infections (per 10k individuals)';
+        app.ax_deaths.YLabel.String = 'Deaths (per 10k individuals)';
+    end
+else
+    app.ax_infections.YLabel.String = 'Infections (absolute number)';
+    app.ax_deaths.YLabel.String = 'Deaths (absolute number)';
+end
+
+% User selection of time to treat as t=0;
+if app.abs.Value
+    if min(app.inf_vs_t(:,end))<10
+        app.abs_date.Value = 1;
+        app.PeopleDropDown.Items = {'1'};
+    else
+        for i=1:log10(min(app.inf_vs_t(:,end)))
+            app.PeopleDropDown.Items{i} = num2str(10^i);
+        end
+        app.PeopleDropDown.Items = app.PeopleDropDown.Items(1:i);
+        app.PeopleLabel.Text = 'People';
+    end
+else
+    if min(app.inf_vs_t(:,end))<1e-3
+        app.abs_date.Value = 1;
+        app.PeopleDropDown.Items = {'0.001'};
+    else
+        for i=-3:log10(min(app.inf_vs_t(:,end)))
+            app.PeopleDropDown.Items{i+4} = num2str(10^i);
+        end
+        app.PeopleDropDown.Items = app.PeopleDropDown.Items(1:i+4);
+        app.PeopleLabel.Text = 'per 10k People';
+    end
+end
+
+
+
 
 % Clear and make new plots of data versus time.
 hold(app.ax_infections,'off'); hold(app.ax_deaths,'off')

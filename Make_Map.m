@@ -77,5 +77,6 @@ colormap(app.map,'jet')
 hcb2 = colorbar('southoutside');
 set(get(hcb2,'Xlabel'),'String','Size of infection')
 set(hcb2,'Ticks',linspace(0,1,length(K)),'TickLabels',2.^[1:length(K)])
+title(['Map of Pandemic on ',app.dates{j}])
 saveas(h,['screenshots/',app.RegionDropDown.Value],'png')
 
