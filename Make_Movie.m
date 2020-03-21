@@ -7,21 +7,20 @@ Nt = size(app.DATA,2);
 
 % Creates and opens a new movie file
 k = 1;
-while exist(['Pandemic_',num2str(k),'.avi'],'file')
+while exist(['movies/',app.RegionDropDown.Value,'_',num2str(k),'.mp4'],'file')
     k=k+1;
 end
-vidObj = VideoWriter(['Pandemic_',num2str(k),'.avi']);
+vidObj = VideoWriter(['movies/',app.RegionDropDown.Value,'_',num2str(k),'.mp4'],'MPEG-4');
 open(vidObj);
 
 DATA = app.DATA;
 Lat = app.Lat;
 Long = app.Long;
 
-app.TimeSlider.Limits = [-Nt+1,0];
-
 % Iterate through time
-for j = 1:Nt
+for j = Nt-30:Nt
     figure(1); clf;
+    clear h
     % Create base map for World, US, or Europe
     switch app.RegionDropDown.Value
         case 'World'
@@ -93,14 +92,14 @@ for j = 1:Nt
         end
     end
     
-    % Add date to title.
-    title(app.dates{j})
-    
-    % Add colorbar for scale.
-    hcb = colorbar('east');
-    hcb.Position([2,4]) = [0.6,0.3];
-    set(get(hcb,'Xlabel'),'String',cblab)
-    set(hcb,'Ticks',linspace(0,1,length(K)),'TickLabels',ticklabs)
+%     h2=figure(2); clf
+%     copyobj(h,h2);
+%     colormap('jet')
+    hcb2 = colorbar('east');
+    hcb2.Position([2,4]) = [0.6,0.3];
+    set(get(hcb2,'Xlabel'),'String',cblab)
+    set(hcb2,'Ticks',linspace(0,1,length(K)),'TickLabels',ticklabs)
+    title(['Map of Pandemic on ',app.dates{j}])
     
     drawnow
     currFrame = getframe(gcf);

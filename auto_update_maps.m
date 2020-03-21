@@ -1,4 +1,5 @@
 %% Auto-Update Maps
+close all force
 try
     A = COVID19_Matlab_App;
     TMP = {'World','US','US Per 10k','Europe'};
@@ -8,6 +9,7 @@ try
         cb = get(eval('A.GenerateMovieButton'),'ButtonPushedFcn'); cb(A,[]);
     end
 catch ME
+    ME
     disp('Map Update Failed');
 end
 
