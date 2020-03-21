@@ -4,7 +4,7 @@ try
     TMP = {'World','US','Europe'};
     for i=1:3
         A.RegionDropDown.Value = TMP{i};
-        cb = get(eval('A.ShowMapButton'),'ButtonPushedFcn'); cb(A,[]);
+        cb = get(eval('A.RegionDropDown'),'ValueChangedFcn'); cb(A,[]);
     end
 catch ME
     disp('Map Update Failed');
