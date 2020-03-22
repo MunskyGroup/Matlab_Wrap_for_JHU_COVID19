@@ -13,9 +13,22 @@ end
 vidObj = VideoWriter(['movies/',app.RegionDropDown.Value,'_',num2str(k),'.mp4'],'MPEG-4');
 open(vidObj);
 
-DATA = app.DATA;
-Lat = app.Lat;
-Long = app.Long;
+switch app.map_what.Value
+    case 'Active'
+        DATA_all = app.DATA - app.DATA_Deaths - app.DATA_Recov;
+    case 'Deaths'
+        DATA_all = app.DATA_Deaths;
+    case 'Cumulative Infected'
+        DATA_all = app.DATA;
+    case 'Recent Infected'
+        DATA_all(:,1:7) = app.DATA(:,1:7);
+        DATA_all = [DATA_all, app.DATA(:,8:end) - app.DATA(:,1:end-7)];
+end
+Lat_all = app.Lat;
+Long_all = app.Long;
+Lat = Lat_all;
+Long = Long_all;
+DATA = DATA_all;
 
 % Iterate through time
 for j = Nt-30:Nt
@@ -41,9 +54,9 @@ for j = Nt-30:Nt
                 'SymbolSpec', faceColors)
             J = strcmp(app.Countries,'US')&~strcmp(app.Countries,'Alaska')&~strcmp(app.Countries,'Hawaii')...
                 &~contains(app.Countries,'Princess');
-            DATA = app.DATA(J,:);
-            Lat = app.Lat(J,:);
-            Long = app.Long(J,:);
+            DATA = DATA_all(J,:);
+            Lat = Lat_all(J,:);
+            Long = Long_all(J,:);
         case 'US Per 10k'
             h = usamap('conus');
             states = shaperead('usastatelo', 'UseGeoCoords', true,...
@@ -57,9 +70,10 @@ for j = Nt-30:Nt
                 'SymbolSpec', faceColors)
             J = strcmp(app.Countries,'US')&~strcmp(app.Countries,'Alaska')&~strcmp(app.Countries,'Hawaii')...
                 &~contains(app.Countries,'Princess');
-            DATA = app.DATA(J,:)./app.Pop_Data(J)*1e4;
-            Lat = app.Lat(J,:);
-            Long = app.Long(J,:);        case 'Europe'
+            DATA = DATA_all(J,:)./app.Pop_Data(J)*1e4;
+            Lat = Lat_all(J,:);
+            Long = Long_all(J,:);
+        case 'Europe'
             h = worldmap('Europe');  % Store the output handle!
             load coastlines
             plotm(coastlat, coastlon);
@@ -99,8 +113,8 @@ for j = Nt-30:Nt
     hcb2.Position([2,4]) = [0.6,0.3];
     set(get(hcb2,'Xlabel'),'String',cblab)
     set(hcb2,'Ticks',linspace(0,1,length(K)),'TickLabels',ticklabs)
-    title(['Map of Pandemic on ',app.dates{j}])
-    
+    title(['Map of Pandemic (',app.map_what.Value,') on ',app.dates{j}]);
+
     drawnow
     currFrame = getframe(gcf);
     writeVideo(vidObj,currFrame);

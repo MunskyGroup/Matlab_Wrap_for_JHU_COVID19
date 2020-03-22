@@ -7,7 +7,19 @@ close all
 cla(app.map);
 Nt = size(app.DATA,2);
 j = round(app.TimeSlider.Value)+Nt;
-DATA = app.DATA;
+
+switch app.map_what.Value
+    case 'Active'
+        DATA = app.DATA - app.DATA_Deaths - app.DATA_Recov;
+    case 'Deaths'
+        DATA = app.DATA_Deaths;
+    case 'Cumulative Infected'
+        DATA = app.DATA;
+    case 'Recent Infected'
+        DATA(:,1:7) = app.DATA(:,1:7);
+        DATA = [DATA, app.DATA(:,8:end) - app.DATA(:,1:end-7)];
+end
+
 Lat = app.Lat;
 Long = app.Long;
 
@@ -66,7 +78,7 @@ if ~strcmp(app.RegionDropDown.Value,'US Per 10k')
     mxI = log2(max(DATA(:)));
     mksize = linspace(4,30,mxI);
     app.TimeSlider.Limits = [-Nt+1,0];
-    K = floor(linspace(1,size(cmap,1),floor(max(log2(DATA(:))))));
+    K = floor(linspace(1,size(cmap,1),floor(log2(max(DATA(:))))));
     ticklabs = 2.^[1:length(K)];
     cblab = 'Size of infection';
 else
@@ -74,7 +86,7 @@ else
     mxI = log2(max(DATA(:)))+5;
     mksize = linspace(4,30,mxI);
     app.TimeSlider.Limits = [-Nt+1,0];
-    K = floor(linspace(1,size(cmap,1),floor(max(log2(DATA(:)))+5)));    
+    K = floor(linspace(1,size(cmap,1),floor(log2(max(DATA(:)))+5)));    
     ticklabs = 2.^([1:length(K)]-5);
     cblab = 'Size of infection per 10k';
 end
@@ -93,7 +105,7 @@ hcb = colorbar(app.map,'east');
 set(get(hcb,'Xlabel'),'String',cblab)
 set(hcb,'Ticks',linspace(0,1,length(K)),'TickLabels',ticklabs)
 hcb.Position([2,4]) = [0.6,0.3];
-app.map.Title.String = ['Map of Pandemic on ',app.dates{j}];
+app.map.Title.String = ['Map of Pandemic (',app.map_what.Value,') on ',app.dates{j}];
 
 figure(2)
 h=gca;
@@ -103,6 +115,7 @@ hcb2 = colorbar('east');
 hcb2.Position([2,4]) = [0.6,0.3];
 set(get(hcb2,'Xlabel'),'String',cblab)
 set(hcb2,'Ticks',linspace(0,1,length(K)),'TickLabels',ticklabs)
-title(['Map of Pandemic on ',app.dates{j}])
+title(['Map of Pandemic (',app.map_what.Value,') on ',app.dates{j}]);
+
 saveas(h,['screenshots/',app.RegionDropDown.Value],'png')
 

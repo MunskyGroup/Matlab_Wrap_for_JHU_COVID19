@@ -8,8 +8,17 @@ function Make_Plot(app)
 app.countries.Value = sort(app.countries.Value);
 app.states.Value = sort(app.states.Value);
 
+if app.act.Value
+        DATA_all = app.DATA - app.DATA_Deaths - app.DATA_Recov;
+elseif app.rec.Value
+        DATA_all(:,1:7) = app.DATA(:,1:7);
+        DATA_all = [DATA_all, app.DATA(:,8:end) - app.DATA(:,1:end-7)];
+elseif app.cum.Value
+        DATA_all = app.DATA;
+end
+
 if app.all.Value  % All at once
-    app.inf_vs_t = sum(app.DATA(:,10:end),1);
+    app.inf_vs_t = sum(DATA_all(:,10:end),1);
     app.dth_vs_t = sum(app.DATA_Deaths(:,10:end),1);
     app.abs.Value=1;
 elseif app.specific.Value  % Specific Countries or states.
@@ -18,7 +27,7 @@ elseif app.specific.Value  % Specific Countries or states.
         app.inf_vs_t =[];app.dth_vs_t =[];
         for j=1:length(app.countries.Value) % separate out specific countries.
             I = ismember(app.Countries,app.countries.Value{j});
-            app.inf_vs_t(j,:) = sum(app.DATA(I,:),1);
+            app.inf_vs_t(j,:) = sum(DATA_all(I,:),1);
             app.dth_vs_t(j,:) = sum(app.DATA_Deaths(I,:),1);
             pop(j) = sum(app.Pop_Data(I),1,'omitnan');
             if pop(j)==0
@@ -34,7 +43,7 @@ elseif app.specific.Value  % Specific Countries or states.
         app.inf_vs_t=[];app.dth_vs_t =[];  % Separate out specific states/regions
         for j=1:length(app.states.Value)
             I = ismember(app.States,app.states.Value{j});
-            app.inf_vs_t(j,:) = app.DATA(I,:);
+            app.inf_vs_t(j,:) = DATA_all(I,:);
             app.dth_vs_t(j,:) = app.DATA_Deaths(I,:);
             pop(j) = app.Pop_Data(I);
         end
