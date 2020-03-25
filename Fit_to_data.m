@@ -50,15 +50,14 @@ X_Array = X_Array';
 % Extract total infected, deaths and recovered from ODE solution
 y_inf = max(1,[0 1 1 1 1]*X_Array);
 y_d = max(1,[0 0 0 0 1]*X_Array);
-y_r = max(1,[0 0 0 1 0]*X_Array);
+% y_r = max(1,[0 0 0 1 0]*X_Array);
  
 % Truncate data to positive values.
 inf_vs_t = max(1,inf_vs_t);
-rcv_vs_t = max(1,rcv_vs_t);
+% rcv_vs_t = max(1,rcv_vs_t);
 dth_vs_t = max(1,dth_vs_t);
 
 % Compute objective function
 err_in_fit = sum(abs(log(y_inf)-log(inf_vs_t)))+...
-    sum(abs(log(y_r)-log(rcv_vs_t)))+...
     sum(abs(log(y_d)-log(dth_vs_t)));
 

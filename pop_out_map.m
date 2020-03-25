@@ -1,4 +1,8 @@
-function [h,cblab,ticklabs,K] = pop_out_map(app,j_time_to_plot)
+function [h,cblab,ticklabs,K] = pop_out_map(app,j_time_to_plot,max_j)
+
+if nargin<3
+    max_j = j_time_to_plot;
+end
 
 figure(314); clf;
 
@@ -66,10 +70,10 @@ Long = Long(J);
 
 % Extrapolate for future dates.
 Nt = size(DATA,2);
-if j_time_to_plot>Nt
+if max_j>Nt
     nf = 5;
     [gr_rate,kept_states] = Make_Growth_Rate_Table(app,nf,DATA);
-    for jt = Nt+1:j_time_to_plot
+    for jt = Nt+1:max_j
         DATA(kept_states,jt) = DATA(kept_states,jt-1).*(2.^(1./gr_rate));
         DATA(~kept_states,jt) = DATA(~kept_states,jt-1);
     end
