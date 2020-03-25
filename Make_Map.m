@@ -38,5 +38,5 @@ if j<=Nt
 else
     title(['Prediction of Pandemic in ',num2str(j-Nt),' days']);
 end
-saveas(f,['screenshots/',app.RegionDropDown.Value,'.png'],'png')
+saveas(f,['screenshots/',app.RegionDropDown.Value],'png')
 
