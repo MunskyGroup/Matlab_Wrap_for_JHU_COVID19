@@ -5,96 +5,10 @@ function Make_Map(app)
 
 close all
 cla(app.map);
-Nt = size(app.DATA,2);
+
+Nt = length(app.dates);
 j = round(app.TimeSlider.Value)+Nt;
-
-switch app.map_what.Value
-    case 'Active'
-        DATA = app.DATA - app.DATA_Deaths - app.DATA_Recov;
-    case 'Deaths'
-        DATA = app.DATA_Deaths;
-    case 'Cumulative Infected'
-        DATA = app.DATA;
-    case 'Recent Infected'
-        DATA(:,1:7) = app.DATA(:,1:7);
-        DATA = [DATA, app.DATA(:,8:end) - app.DATA(:,1:end-7)];
-end
-
-Lat = app.Lat;
-Long = app.Long;
-
-app.TimeSlider.MajorTicks = [-Nt+1:5:0];
-app.TimeSlider.MinorTicks = [-Nt+1:1:0];
-app.TimeSlider.MajorTickLabels = {app.dates{1:5:end}};
-
-% Create base map for World, US, or Europe
-switch app.RegionDropDown.Value
-    case 'World'
-        h = worldmap('World');  % Store the output handle!
-        load coastlines
-        plotm(coastlat, coastlon);
-        geoshow('landareas.shp', 'FaceColor', [0.15 0.5 0.15])
-    case 'US'
-        h = usamap('conus');
-        states = shaperead('usastatelo', 'UseGeoCoords', true,...
-            'Selector',...
-            {@(name) ~any(strcmp(name,{'Alaska','Hawaii'})), 'Name'});
-        faceColors = makesymbolspec('Polygon',...
-            {'INDEX', [1 numel(states)], 'FaceColor', ...
-            polcmap(numel(states))}); %NOTE - colors are random
-        geoshow(h, states, 'DisplayType', 'polygon', ...
-            'SymbolSpec', faceColors)    
-        J = strcmp(app.Countries,'US')&~strcmp(app.Countries,'Alaska')&~strcmp(app.Countries,'Hawaii')...
-            &~contains(app.Countries,'Princess');
-        DATA = DATA(J,:);
-        Lat = Lat(J,:);
-        Long = Long(J,:);
-    case 'US Per 10k'
-        h = usamap('conus');
-        states = shaperead('usastatelo', 'UseGeoCoords', true,...
-            'Selector',...
-            {@(name) ~any(strcmp(name,{'Alaska','Hawaii'})), 'Name'});
-        faceColors = makesymbolspec('Polygon',...
-            {'INDEX', [1 numel(states)], 'FaceColor', ...
-            polcmap(numel(states))}); %NOTE - colors are random
-        geoshow(h, states, 'DisplayType', 'polygon', ...
-            'SymbolSpec', faceColors)    
-        J = strcmp(app.Countries,'US')&~strcmp(app.Countries,'Alaska')&~strcmp(app.Countries,'Hawaii')...
-            &~contains(app.Countries,'Princess');
-        DATA = DATA(J,:)./app.Pop_Data(J)*1e4;
-        Lat = Lat(J,:);
-        Long = Long(J,:);
-case 'Europe'
-    h = worldmap('Europe');  % Store the output handle!
-    load coastlines
-    plotm(coastlat, coastlon);
-    geoshow('landareas.shp', 'FaceColor', [0.15 0.5 0.15])
-end
-
-% Bin data for plotting
-cmap = colormap('jet');
-if ~strcmp(app.RegionDropDown.Value,'US Per 10k')
-    I = floor(log2(DATA(:,j)));
-    mxI = log2(max(DATA(:)));
-    mksize = linspace(4,30,mxI);
-    app.TimeSlider.Limits = [-Nt+1,0];
-    K = floor(linspace(1,size(cmap,1),floor(log2(max(DATA(:))))));
-    ticklabs = 2.^[1:length(K)];
-    cblab = 'Size of infection';
-else
-    I = floor(log2(DATA(:,j))+5);
-    mxI = log2(max(DATA(:)))+5;
-    mksize = linspace(4,30,mxI);
-    app.TimeSlider.Limits = [-Nt+1,0];
-    K = floor(linspace(1,size(cmap,1),floor(log2(max(DATA(:)))+5)));    
-    ticklabs = 2.^([1:length(K)]-5);
-    cblab = 'Size of infection per 10k';
-end
-
-% Add points for all states/regions
-for i=1:max(I)
-    geoshow(Lat(I==i),Long(I==i),'DisplayType', 'Point', 'Marker', 'o', 'Color',cmap(K(i),:),'MarkerFaceColor',cmap(K(i),:),'MarkerSize',mksize(i))
-end
+[h,cblab,ticklabs,K] = pop_out_map(app,j);
 
 copyobj(h.Children, app.map);  % Copy all of the axis' children to app axis
 % delete(h.Parent) % get rid of the figure created by worldmap()
@@ -117,5 +31,5 @@ set(get(hcb2,'Xlabel'),'String',cblab)
 set(hcb2,'Ticks',linspace(0,1,length(K)),'TickLabels',ticklabs)
 title(['Map of Pandemic (',app.map_what.Value,') on ',app.dates{j}]);
 
-saveas(h,['screenshots/',app.RegionDropDown.Value],'png')
+saveas(h,['screenshots/',app.RegionDropDown.Value,'.png'],'png')
 

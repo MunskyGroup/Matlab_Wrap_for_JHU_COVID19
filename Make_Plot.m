@@ -4,67 +4,54 @@ function Make_Plot(app)
 % states depending upon user selections in the 'COVID19_Matlab_App' GUI
 % (app).
 
+if app.abs.Value
+    DATA = app.DATA;
+    DATA_Deaths = app.DATA_Deaths;
+    DATA_Recov = app.DATA_Recov;
+    app.ax_infections.YLabel.String = 'Infections (absolute number)';
+    app.ax_deaths.YLabel.String = 'Deaths (absolute number)';
+    countries = app.Countries;
+else
+    DATA = app.Pop_Data.DATA;
+    DATA_Deaths = app.Pop_Data.DATA_Deaths;
+    DATA_Recov = app.Pop_Data.DATA_Recov;
+    app.ax_infections.YLabel.String = 'Infections (per 10k individuals)';
+    app.ax_deaths.YLabel.String = 'Deaths (per 10k individuals)';
+    countries = app.Pop_Data.Country_Names;
+end
+
 % First we sort countries/states so that they are in alphabetic order
 app.countries.Value = sort(app.countries.Value);
 app.states.Value = sort(app.states.Value);
-
 if app.act.Value
-        DATA_all = app.DATA - app.DATA_Deaths - app.DATA_Recov;
+        DATA_all = DATA - DATA_Deaths - DATA_Recov;
 elseif app.rec.Value
-        DATA_all(:,1:7) = app.DATA(:,1:7);
-        DATA_all = [DATA_all, app.DATA(:,8:end) - app.DATA(:,1:end-7)];
+        DATA_all(:,1:7) = DATA(:,1:7);
+        DATA_all = [DATA_all, DATA(:,8:end) - DATA(:,1:end-7)];
 elseif app.cum.Value
-        DATA_all = app.DATA;
+        DATA_all = DATA;
 end
 
 if app.all.Value  % All at once
     app.inf_vs_t = sum(DATA_all(:,10:end),1);
-    app.dth_vs_t = sum(app.DATA_Deaths(:,10:end),1);
+    app.dth_vs_t = sum(DATA_Deaths(:,10:end),1);
     app.abs.Value=1;
 elseif app.specific.Value  % Specific Countries or states.
     if strcmp(app.states.Value,'ALL') % All states in chosen country/counties.
-        pop = [];
         app.inf_vs_t =[];app.dth_vs_t =[];
         for j=1:length(app.countries.Value) % separate out specific countries.
-            I = ismember(app.Countries,app.countries.Value{j});
+            I = ismember(countries,app.countries.Value{j});
             app.inf_vs_t(j,:) = sum(DATA_all(I,:),1);
-            app.dth_vs_t(j,:) = sum(app.DATA_Deaths(I,:),1);
-            pop(j) = sum(app.Pop_Data(I),1,'omitnan');
-            if pop(j)==0
-                try
-                    I = ismember(app.Country_Pop.Country_Names,app.countries.Value{j});
-                    pop(j) = app.Country_Pop.Country_Pops(I);
-                catch
-                end
-            end
+            app.dth_vs_t(j,:) = sum(DATA_Deaths(I,:),1);
         end
     else
-        pop = [];
         app.inf_vs_t=[];app.dth_vs_t =[];  % Separate out specific states/regions
         for j=1:length(app.states.Value)
             I = ismember(app.States,app.states.Value{j});
             app.inf_vs_t(j,:) = DATA_all(I,:);
-            app.dth_vs_t(j,:) = app.DATA_Deaths(I,:);
-            pop(j) = app.Pop_Data(I);
+            app.dth_vs_t(j,:) = DATA_Deaths(I,:);
         end
     end
-    pop(pop==0)=NaN;
-end
-
-if app.rel.Value
-    if isnan(sum(pop))
-        app.abs.Value=1;
-        app.ax_infections.YLabel.String = 'Infections (absolute number)';
-        app.ax_deaths.YLabel.String = 'Deaths (absolute number)';
-    else
-        app.inf_vs_t=app.inf_vs_t./pop'*1e4;
-        app.dth_vs_t=app.dth_vs_t./pop'*1e4;
-        app.ax_infections.YLabel.String = 'Infections (per 10k individuals)';
-        app.ax_deaths.YLabel.String = 'Deaths (per 10k individuals)';
-    end
-else
-    app.ax_infections.YLabel.String = 'Infections (absolute number)';
-    app.ax_deaths.YLabel.String = 'Deaths (absolute number)';
 end
 
 % User selection of time to treat as t=0;
@@ -91,8 +78,6 @@ else
         app.PeopleLabel.Text = 'per 10k People';
     end
 end
-
-
 
 
 % Clear and make new plots of data versus time.
