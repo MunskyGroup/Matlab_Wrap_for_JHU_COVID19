@@ -19,9 +19,13 @@ hcb = colorbar(app.map,'east');
 set(get(hcb,'Xlabel'),'String',cblab)
 set(hcb,'Ticks',linspace(0,1,length(K)),'TickLabels',ticklabs)
 hcb.Position([2,4]) = [0.6,0.3];
-app.map.Title.String = ['Map of Pandemic (',app.map_what.Value,') on ',app.dates{j}];
+if j<=Nt
+    app.map.Title.String = ['Map of Pandemic (',app.map_what.Value,') on ',app.dates{j}];
+else
+    app.map.Title.String = ['Prediction of Pandemic in ',num2str(j-Nt),' days'];
+end
 
-figure(2)
+f = figure(2);
 h=gca;
 copyobj(app.map.Children,h);
 colormap('jet')
@@ -29,7 +33,10 @@ hcb2 = colorbar('east');
 hcb2.Position([2,4]) = [0.6,0.3];
 set(get(hcb2,'Xlabel'),'String',cblab)
 set(hcb2,'Ticks',linspace(0,1,length(K)),'TickLabels',ticklabs)
-title(['Map of Pandemic (',app.map_what.Value,') on ',app.dates{j}]);
-
-saveas(h,['screenshots/',app.RegionDropDown.Value,'.png'],'png')
+if j<=Nt
+    title(['Map of Pandemic (',app.map_what.Value,') on ',app.dates{j}]);
+else
+    title(['Prediction of Pandemic in ',num2str(j-Nt),' days']);
+end
+saveas(f,['screenshots/',app.RegionDropDown.Value,'.png'],'png')
 

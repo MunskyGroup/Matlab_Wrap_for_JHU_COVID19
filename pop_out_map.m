@@ -64,6 +64,17 @@ DATA = DATA(J,:);
 Lat = Lat(J);
 Long = Long(J);
 
+% Extrapolate for future dates.
+Nt = size(DATA,2);
+if j_time_to_plot>Nt
+    nf = 5;
+    [gr_rate,kept_states] = Make_Growth_Rate_Table(app,nf,DATA);
+    for jt = Nt+1:j_time_to_plot
+        DATA(kept_states,jt) = DATA(kept_states,jt-1).*(2.^(1./gr_rate));
+        DATA(~kept_states,jt) = DATA(~kept_states,jt-1);
+    end
+end
+
 % Bin data for plotting
 cmap = colormap('jet');
 if app.abs_2.Value

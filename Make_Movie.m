@@ -14,7 +14,7 @@ vidObj = VideoWriter(['movies/',app.RegionDropDown.Value,'_',num2str(k),'.mp4'],
 open(vidObj);
 
 % Iterate through time
-for j = Nt-30:Nt
+for j = Nt-10:Nt+7
     
     [~,cblab,ticklabs,K] = pop_out_map(app,j);
 
@@ -22,7 +22,11 @@ for j = Nt-30:Nt
     hcb2.Position([2,4]) = [0.6,0.3];
     set(get(hcb2,'Xlabel'),'String',cblab)
     set(hcb2,'Ticks',linspace(0,1,length(K)),'TickLabels',ticklabs)
-    title(['Map of Pandemic (',app.map_what.Value,') on ',app.dates{j}]);
+    if j<=Nt
+        title(['Map of Pandemic (',app.map_what.Value,') on ',app.dates{j}]);
+    else
+        title(['Prediction of Pandemic in ',num2str(j-Nt),' days']);
+    end
 
     drawnow
     currFrame = getframe(gcf);
