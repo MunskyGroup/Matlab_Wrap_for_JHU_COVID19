@@ -79,6 +79,11 @@ if max_j>Nt
     end
 end
 
+% [a,b] = max(DATA(:,end))
+% countries = countries(J);
+% countries(b)
+
+
 % Bin data for plotting
 cmap = colormap('jet');
 if app.abs_2.Value

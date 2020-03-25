@@ -25,7 +25,8 @@ for j = Nt-30:Nt+7
     if j<=Nt
         title(['Map of Pandemic (',app.map_what.Value,') on ',app.dates{j}]);
     else
-        title(['Prediction of Pandemic in ',num2str(j-Nt),' days']);
+        str = ['Prediction of Pandemic for ',datestr(datenum(app.dates{end},'mm/dd/yyyy')+j-Nt)];
+        title(str(1:end-5));
     end
 
     drawnow

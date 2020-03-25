@@ -22,7 +22,8 @@ hcb.Position([2,4]) = [0.6,0.3];
 if j<=Nt
     app.map.Title.String = ['Map of Pandemic (',app.map_what.Value,') on ',app.dates{j}];
 else
-    app.map.Title.String = ['Prediction of Pandemic in ',num2str(j-Nt),' days'];
+    app.map.Title.String = ['Prediction of Pandemic for ',datestr(datenum(app.dates{end},'mm/dd/yyyy')+j-Nt)];
+    app.map.Title.String =app.map.Title.String(1:end-5);
 end
 
 f = figure(2);
