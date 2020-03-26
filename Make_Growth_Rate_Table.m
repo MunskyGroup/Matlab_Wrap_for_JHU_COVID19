@@ -18,12 +18,13 @@ if nargin<2
     nf = app.days_for_trend.Value;
     DATA = app.DATA;
 elseif nargout>=1
+    clear ListA ListB
     for i = 1:size(DATA,1)
         ListA(i) = {num2str(i)};
         ListB(i) = {num2str(i)};
     end
-    kept_states = zeros(size(DATA,1),1,'logical');
 end
+kept_states = zeros(size(DATA,1),1,'logical');
 NC = length(ListA);
 N = size(DATA,2);
 xf = [0:nf]';

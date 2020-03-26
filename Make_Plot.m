@@ -7,14 +7,14 @@ function Make_Plot(app)
 if app.abs.Value
     DATA = app.DATA;
     DATA_Deaths = app.DATA_Deaths;
-    DATA_Recov = app.DATA_Recov;
+%     DATA_Recov = app.DATA_Recov;
     app.ax_infections.YLabel.String = 'Infections (absolute number)';
     app.ax_deaths.YLabel.String = 'Deaths (absolute number)';
     countries = app.Countries;
 else
     DATA = app.Pop_Data.DATA;
     DATA_Deaths = app.Pop_Data.DATA_Deaths;
-    DATA_Recov = app.Pop_Data.DATA_Recov;
+%     DATA_Recov = app.Pop_Data.DATA_Recov;
     app.ax_infections.YLabel.String = 'Infections (per 10k individuals)';
     app.ax_deaths.YLabel.String = 'Deaths (per 10k individuals)';
     countries = app.Pop_Data.Country_Names;

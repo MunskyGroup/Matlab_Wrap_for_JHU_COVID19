@@ -40,16 +40,17 @@ end
 % Create base map for World, US, or Europe
 J = ones(size(DATA,1),1,'logical');
 switch app.RegionDropDown.Value
-    case {'World','World per 10k'}
+    case {'World'}
         h = worldmap('World');  % Store the output handle!
         load coastlines
         plotm(coastlat, coastlon);
         geoshow('landareas.shp', 'FaceColor', [0.15 0.5 0.15])
-    case {'US','US per 10k'}
+    case {'US'}
         h = usamap('conus');
         states = shaperead('usastatelo', 'UseGeoCoords', true,...
             'Selector',...
             {@(name) ~any(strcmp(name,{'Alaska','Hawaii'})), 'Name'});
+        rng(0);
         faceColors = makesymbolspec('Polygon',...
             {'INDEX', [1 numel(states)], 'FaceColor', ...
             polcmap(numel(states))}); %NOTE - colors are random
@@ -57,7 +58,7 @@ switch app.RegionDropDown.Value
             'SymbolSpec', faceColors)
         J = strcmp(countries,'US')&~strcmp(countries,'Alaska')&~strcmp(countries,'Hawaii')...
             &~contains(countries,'Princess');
-    case {'Europe','Europe per 10k'}
+    case {'Europe'}
         h = worldmap('Europe');  % Store the output handle!
         load coastlines
         plotm(coastlat, coastlon);
