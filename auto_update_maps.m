@@ -37,7 +37,7 @@ catch ME
     ME
 end
 %% Test State-by-State Comparisons
-try
+% try
     close all force
     A = COVID19_Matlab_App;
     
@@ -60,6 +60,6 @@ try
     xlim(A.ax_infections,[-5,15]);
     xlim(A.ax_deaths,[-5,15]);
     ylim(A.ax_deaths,[1e-4,1e-1]);
-catch ME
-    ME
-end
+% catch ME
+%     ME
+% end

@@ -1,4 +1,3 @@
-
 warning('off')
 addpath('../COVID-19/csse_covid_19_data/csse_covid_19_time_series/')
 W = importdata('time_series_covid19_confirmed_global.csv');
@@ -46,3 +45,6 @@ for id = length(dates):-1:1
 end
 save('data/state_data.mat','Z_D*');
 
+%%
+clear all
+Z = readtable(['../COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv']);

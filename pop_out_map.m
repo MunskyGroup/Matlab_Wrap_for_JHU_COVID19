@@ -28,7 +28,9 @@ end
 
 switch app.map_what.Value
     case 'Active'
-        DATA = DATA - DATA_Deaths - DATA_Recov;
+        DATA = max(0,DATA - DATA_Deaths - DATA_Recov);
+    case 'Recovered'
+        DATA = max(0,DATA_Recov);
     case 'Deaths'
         DATA = DATA_Deaths;
     case 'Cumulative Infected'
