@@ -11,6 +11,7 @@ if app.abs.Value
     app.ax_infections.YLabel.String = 'Infections (absolute number)';
     app.ax_deaths.YLabel.String = 'Deaths (absolute number)';
     countries = app.Countries;
+    states = app.States;
 else
     DATA = app.Pop_Data.DATA;
     DATA_Deaths = app.Pop_Data.DATA_Deaths;
@@ -18,6 +19,7 @@ else
     app.ax_infections.YLabel.String = 'Infections (per 10k individuals)';
     app.ax_deaths.YLabel.String = 'Deaths (per 10k individuals)';
     countries = app.Pop_Data.Country_Names;
+    states = app.Pop_Data.State;
 end
 
 % First we sort countries/states so that they are in alphabetic order
@@ -33,28 +35,37 @@ elseif app.cum.Value
 end
 
 if app.all.Value  % All at once
-    app.inf_vs_t = sum(DATA_all(:,10:end),1);
-    app.dth_vs_t = sum(DATA_Deaths(:,10:end),1);
+    if app.abs.Value
+        app.inf_vs_t = sum(DATA_all,1);
+        app.dth_vs_t = sum(DATA_Deaths,1);
+    else
+        app.inf_vs_t = sum(DATA_all.*app.Pop_Data.Pops,1)/sum(app.Pop_Data.Pops);
+        app.dth_vs_t = sum(DATA_Deaths.*app.Pop_Data.Pops,1)/sum(app.Pop_Data.Pops);
+    end
     app.abs.Value=1;
 elseif app.specific.Value  % Specific Countries or states.
     if strcmp(app.states.Value,'ALL') % All states in chosen country/counties.
         app.inf_vs_t =[];app.dth_vs_t =[];
         for j=1:length(app.countries.Value) % separate out specific countries.
             I = ismember(countries,app.countries.Value{j});
-            app.inf_vs_t(j,:) = sum(DATA_all(I,:),1);
-            app.dth_vs_t(j,:) = sum(DATA_Deaths(I,:),1);
+            if app.abs.Value
+                app.inf_vs_t(j,:) = sum(DATA_all(I,:),1);
+                app.dth_vs_t(j,:) = sum(DATA_Deaths(I,:),1);
+            else
+                app.inf_vs_t(j,:) = sum(DATA_all(I,:).*app.Pop_Data.Pops(I),1)/sum(app.Pop_Data.Pops(I));
+                app.dth_vs_t(j,:) = sum(DATA_Deaths(I,:).*app.Pop_Data.Pops(I),1)/sum(app.Pop_Data.Pops(I));
+            end
         end
     else
         app.inf_vs_t=[];app.dth_vs_t =[];  % Separate out specific states/regions
         for j=1:length(app.states.Value)
-            I = ismember(app.States,app.states.Value{j});
+            I = ismember(states,app.states.Value{j});
             app.inf_vs_t(j,:) = DATA_all(I,:);
             app.dth_vs_t(j,:) = DATA_Deaths(I,:);
         end
     end
 end
 
-% User selection of time to treat as t=0;
 if app.abs.Value
     if min(app.inf_vs_t(:,end))<10
         app.abs_date.Value = 1;
