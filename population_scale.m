@@ -42,9 +42,9 @@ for i = 1:length(app.States)
     end
 end
 app.Pop_Data.Pops = POP(I_pop);
-app.Pop_Data.DATA = app.DATA(I_pop,:)./POP(I_pop)*1e4;
-app.Pop_Data.DATA_Deaths = app.DATA_Deaths(I_pop,:)./POP(I_pop)*1e4;
-app.Pop_Data.DATA_Recov = app.DATA_Recov(I_pop,:)./POP(I_pop)*1e4;
+app.Pop_Data.DATA = app.DATA(I_pop,:)./repmat(POP(I_pop),1,size(app.DATA,2))*1e4;
+app.Pop_Data.DATA_Deaths = app.DATA_Deaths(I_pop,:)./repmat(POP(I_pop),1,size(app.DATA,2))*1e4;
+app.Pop_Data.DATA_Recov = app.DATA_Recov(I_pop,:)./repmat(POP(I_pop),1,size(app.DATA,2))*1e4;
 app.Pop_Data.Long = app.Long(I_pop);
 app.Pop_Data.Lat = app.Lat(I_pop);
 app.Pop_Data.Country_Names = app.Countries(I_pop);

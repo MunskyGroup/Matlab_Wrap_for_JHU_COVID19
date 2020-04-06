@@ -47,20 +47,29 @@ grid(app.ax_infections,'on')
 grid(app.ax_deaths,'on')
 end
 
-function [Z1,UB,LB,n] = compute_trend(xf,yf,X,Nt,nf,n0)
+function [Z1,UB,LB,n] = compute_trend(xf,yf,X,Nt,nf,n0,trend_type)
 % Compute the trend lines.
 Y = log(yf)';
 x = xf(isfinite(Y));
 Y = Y(isfinite(Y));
 n=length(Y);
-sxy = sum((x-mean(x)).*(Y-mean(Y))); sxx = sum((x-mean(x)).^2); syy = sum((Y-mean(Y)).^2);
-m = sxy/sxx; b = mean(Y)-m*mean(x);
-z1 = m*(X+nf+n0-Nt)+b;
-Z1 = exp(z1);
-sr = sqrt((syy-m^2*sxx)/(n+2));
-sy = sr*sqrt(1+1/n+(X+nf+n0-Nt-mean(x)).^2/sxx);
-UB = exp(z1+sy)-exp(z1);
-LB = -exp(z1-sy)+exp(z1);
+if nargin<7
+    trend_type = 'log';
+end
+
+switch trend_type
+    case 'log'       
+        sxy = sum((x-mean(x)).*(Y-mean(Y))); sxx = sum((x-mean(x)).^2); syy = sum((Y-mean(Y)).^2);
+        m = sxy/sxx; b = mean(Y)-m*mean(x);
+        z1 = m*(X+nf+n0-Nt)+b;
+        Z1 = exp(z1);
+        sr = sqrt((syy-m^2*sxx)/(n+2));
+        sy = sr*sqrt(1+1/n+(X+nf+n0-Nt-mean(x)).^2/sxx);
+        UB = exp(z1+sy)-exp(z1);
+        LB = -exp(z1-sy)+exp(z1);
+    case 'quad'
+end
+
 end
 
 function [t0] = make_trend_plot(ax,X,Y,Z1,UB,LB,Nt,n0,n,K,cmap,Ns,is,rel_date,rel_num,t0)
