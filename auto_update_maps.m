@@ -31,8 +31,8 @@ try
     cb = get(eval(['A.PeopleDropDown']),'ValueChangedFcn'); cb(A,[]);
     
     ylim(A.ax_infections,[50,1e5])
-    xlim(A.ax_infections,[-10,30])
-    xlim(A.ax_deaths,[-10,30]);
+    xlim(A.ax_infections,[-10,40])
+    xlim(A.ax_deaths,[-10,40]);
 catch ME
     ME
 end
@@ -56,10 +56,10 @@ end
     A.PeopleDropDown.Value = '0.1';
     cb = get(eval(['A.PeopleDropDown']),'ValueChangedFcn'); cb(A,[]);
     
-    ylim(A.ax_infections,[1e-2,1e1]);
-    xlim(A.ax_infections,[-5,15]);
-    xlim(A.ax_deaths,[-5,15]);
-    ylim(A.ax_deaths,[1e-4,1e-1]);
+    ylim(A.ax_infections,[1e-2,1e2]);
+    xlim(A.ax_infections,[-5,40]);
+    xlim(A.ax_deaths,[-5,40]);
+    ylim(A.ax_deaths,[1e-4,1e1]);
 % catch ME
 %     ME
 % end
