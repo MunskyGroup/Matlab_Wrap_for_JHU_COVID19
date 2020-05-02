@@ -69,4 +69,4 @@ end
 app.gr_table.Data = Data(I,:);
 
 % Make Histogram of growth rates.
-histogram(app.gr_hist,[app.gr_table.Data{:,2}],[0:10],'Normalization','probability');
+histogram(app.gr_hist,[app.gr_table.Data{:,2}],[0:2:30],'Normalization','probability');

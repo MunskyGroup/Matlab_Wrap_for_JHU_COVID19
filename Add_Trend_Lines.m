@@ -17,16 +17,23 @@ hold(app.ax_deaths,'off')
 cmap = colormap('jet');
 K = floor(linspace(1,size(cmap,1),Ns));
 
+if app.LogQuadraticButton.Value
+    trend_type = 'quad';
+else
+    trend_type = 'log';
+end
+   
+
 %% Regresion for infections
 % Iterate through Ns regions.
 for is = 1:Ns
     % Compute and plot trend line for infections
-    [Z1,UB,LB,n] = compute_trend(xf,app.inf_vs_t(is,Nt-nf-n0:Nt-n0),X,Nt,nf,n0);
+    [Z1,UB,LB,n] = compute_trend(xf,app.inf_vs_t(is,Nt-nf-n0:Nt-n0),X,Nt,nf,n0,trend_type);
     [t0] = make_trend_plot(app.ax_infections,X,app.inf_vs_t(is,:),Z1,UB,LB,Nt,n0,n,K,cmap,Ns,...
         is,app.rel_date.Value,eval(app.PeopleDropDown.Value));
     
     % Compute and plot trend line for deaths
-    [Z1,UB,LB,n] = compute_trend(xf,app.dth_vs_t(is,Nt-nf-n0:Nt-n0),X,Nt,nf,n0);
+    [Z1,UB,LB,n] = compute_trend(xf,app.dth_vs_t(is,Nt-nf-n0:Nt-n0),X,Nt,nf,n0,trend_type);
     make_trend_plot(app.ax_deaths,X,app.dth_vs_t(is,:),Z1,UB,LB,Nt,n0,n,K,cmap,Ns,...
         is,[],[],t0);
 end
@@ -68,6 +75,14 @@ switch trend_type
         UB = exp(z1+sy)-exp(z1);
         LB = -exp(z1-sy)+exp(z1);
     case 'quad'
+        XX = [ones(size(x)),x,x.^2];
+        M = XX\Y;
+        x2 = (X+nf+n0-Nt)';
+        x2 = [ones(size(x2)),x2,x2.^2];
+        z1 = x2*M;
+        Z1 = exp(z1);
+        UB=[];
+        LB =[];
 end
 
 end

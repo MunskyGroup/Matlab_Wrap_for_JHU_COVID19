@@ -8,6 +8,7 @@ if app.abs.Value
     DATA = app.DATA;
     DATA_Deaths = app.DATA_Deaths;
     DATA_Recov = app.DATA_Recov;
+    DATA_pt = app.DATA_pt;
     app.ax_infections.YLabel.String = 'Infections (absolute number)';
     app.ax_deaths.YLabel.String = 'Deaths (absolute number)';
     countries = app.Countries;
@@ -16,6 +17,7 @@ else
     DATA = app.Pop_Data.DATA;
     DATA_Deaths = app.Pop_Data.DATA_Deaths;
     DATA_Recov = app.Pop_Data.DATA_Recov;
+    DATA_pt = app.Pop_Data.DATA_pt;
     app.ax_infections.YLabel.String = 'Infections (per 10k individuals)';
     app.ax_deaths.YLabel.String = 'Deaths (per 10k individuals)';
     countries = app.Pop_Data.Country_Names;
@@ -26,12 +28,37 @@ end
 app.countries.Value = sort(app.countries.Value);
 app.states.Value = sort(app.states.Value);
 if app.act.Value
-        DATA_all = DATA - DATA_Deaths - DATA_Recov;
+    DATA_all = DATA - DATA_Deaths - DATA_Recov;
+    app.ax_infections.YLabel.String = 'Actively Infected';
+    app.ax_infections.Title.String = 'Actively infected over time';
 elseif app.rec.Value
-        DATA_all(:,1:7) = DATA(:,1:7);
-        DATA_all = [DATA_all, DATA(:,8:end) - DATA(:,1:end-7)];
+    dr = app.days_rec_inf.Value;
+    DATA_all(:,1:dr) = DATA(:,1:dr);
+    DATA_all = [DATA_all, DATA(:,dr+1:end) - DATA(:,1:end-dr)]/dr;
+    app.ax_infections.YLabel.String = 'Recently Infected';
+    app.ax_infections.Title.String = 'Recently infected over time';
 elseif app.cum.Value
-        DATA_all = DATA;
+    DATA_all = DATA;
+    app.ax_infections.YLabel.String = 'Cummulative Infected';
+    app.ax_infections.Title.String = 'Cummulative infected over time';
+elseif app.pt.Value
+    DATA_all = DATA_pt;
+    app.ax_infections.YLabel.String = 'People Tested';
+    app.ax_infections.Title.String = 'People Tested over time';
+elseif app.rpt.Value
+    app.ax_infections.YLabel.String = 'People Recently Tested';
+    app.ax_infections.Title.String = 'People Recently Tested over time';
+    dr = app.days_rec_inf.Value;
+    DATA_all(:,1:dr) = DATA_pt(:,1:dr);
+    DATA_all = [DATA_all, DATA_pt(:,dr+1:end) - DATA_pt(:,1:end-dr)]/dr;
+end
+
+if app.abs.Value
+    app.ax_infections.YLabel.String = [app.ax_infections.YLabel.String,' (absolute number)'];
+    app.ax_deaths.YLabel.String = 'Deaths (absolute number)';
+else
+    app.ax_infections.YLabel.String = [app.ax_infections.YLabel.String,' (per 10k individuals)'];
+    app.ax_deaths.YLabel.String = 'Deaths (per 10k individuals)';
 end
 
 if app.all.Value  % All at once
