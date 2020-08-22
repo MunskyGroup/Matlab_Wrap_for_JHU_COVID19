@@ -6,7 +6,7 @@ try
     for i=1:3
         A.RegionDropDown.Value = TMP{i};
         cb = get(eval('A.RegionDropDown'),'ValueChangedFcn'); cb(A,[]);
-        cb = get(eval('A.GenerateMovieButton'),'ButtonPushedFcn'); cb(A,[]);
+%         cb = get(eval('A.GenerateMovieButton'),'ButtonPushedFcn'); cb(A,[]);
     end
 catch ME
     ME
@@ -31,8 +31,8 @@ try
     cb = get(eval(['A.PeopleDropDown']),'ValueChangedFcn'); cb(A,[]);
     
     ylim(A.ax_infections,[50,1e5])
-    xlim(A.ax_infections,[-10,40])
-    xlim(A.ax_deaths,[-10,40]);
+    xlim(A.ax_infections,[-10,180])
+    xlim(A.ax_deaths,[-10,180]);
 catch ME
     ME
 end
@@ -57,8 +57,8 @@ end
     cb = get(eval(['A.PeopleDropDown']),'ValueChangedFcn'); cb(A,[]);
     
     ylim(A.ax_infections,[1e-2,1e2]);
-    xlim(A.ax_infections,[-5,40]);
-    xlim(A.ax_deaths,[-5,40]);
+    xlim(A.ax_infections,[-5,180]);
+    xlim(A.ax_deaths,[-5,180]);
     ylim(A.ax_deaths,[1e-4,1e1]);
 % catch ME
 %     ME

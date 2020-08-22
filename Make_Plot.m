@@ -51,6 +51,15 @@ elseif app.rpt.Value
     dr = app.days_rec_inf.Value;
     DATA_all(:,1:dr) = DATA_pt(:,1:dr);
     DATA_all = [DATA_all, DATA_pt(:,dr+1:end) - DATA_pt(:,1:end-dr)]/dr;
+elseif app.inf_p_test.Value
+    app.ax_infections.YLabel.String = 'Fraction of Tests Positive';
+    app.ax_infections.Title.String = 'People Infected per Test';
+    dr = app.days_rec_inf.Value;
+    tmp(:,1:dr) = DATA(:,1:dr);
+    tmp = [tmp, DATA(:,dr+1:end) - DATA(:,1:end-dr)]/dr;
+    tmp2(:,1:dr) = DATA_pt(:,1:dr);
+    tmp2 = [tmp2, DATA_pt(:,dr+1:end) - DATA_pt(:,1:end-dr)]/dr;    
+    DATA_all = tmp./tmp2;
 end
 
 if app.abs.Value
@@ -117,7 +126,6 @@ else
     end
 end
 
-
 % Clear and make new plots of data versus time.
 hold(app.ax_infections,'off'); hold(app.ax_deaths,'off')
 legend(app.ax_deaths,'off'); legend(app.ax_infections,'off')
@@ -131,7 +139,7 @@ if app.specific.Value
 end
 
 % Call function to add trend lines if requested.
-if app.add_trend_lines.Value
+if app.add_trend_lines.Value && ~app.inf_p_test.Value
     Add_Trend_Lines(app)
 end
 
