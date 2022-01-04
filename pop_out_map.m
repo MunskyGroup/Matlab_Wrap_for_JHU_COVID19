@@ -41,7 +41,8 @@ switch app.map_what.Value
     case 'Cumulative Infected'
         DATA = DATA;
     case 'Recent Infected'
-        DATA = max(0,[DATA(:,1:3), DATA(:,4:end) - DATA(:,1:end-3)]);
+        Nwin = 10;
+        DATA = max(0,[DATA(:,1:Nwin), DATA(:,Nwin+1:end) - DATA(:,1:end-Nwin)]);
 end
 
 % Create base map for World, US, or Europe

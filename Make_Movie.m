@@ -13,10 +13,11 @@ end
 vidObj = VideoWriter(['movies/',app.RegionDropDown.Value,'_',num2str(k),'.mp4'],'MPEG-4');
 open(vidObj);
 
+MovDays = app.MovDays.Value;
 % Iterate through time
-for j = Nt-364:Nt
+for j = Nt-MovDays:Nt
     
-    [~,cblab,ticklabs,K] = pop_out_map(app,j,Nt,Nt-364);
+    [~,cblab,ticklabs,K] = pop_out_map(app,j,Nt,Nt-MovDays);
 
     hcb2 = colorbar('east');
     hcb2.Position([2,4]) = [0.6,0.3];
