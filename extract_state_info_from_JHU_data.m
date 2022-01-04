@@ -12,10 +12,18 @@ for i=1:length(us_state_names)
 end
 
 for id = length(dates):-1:1
-    d_txt = ['0',dates{id},'20']; d_txt(d_txt=='/') = '-';
-    if d_txt(5)=='-'
-        d_txt = [d_txt(1:3),'0',d_txt(4:end)];
-    end
+    d_txt = dates{id};
+    if d_txt(2)=='/'; d_txt = ['0',d_txt];end
+    if d_txt(5)=='/'; d_txt = [d_txt(1:3),'0',d_txt(4:end)];end
+    d_txt = [d_txt(1:6),'20',d_txt(7:8)];
+    Z_DATA_DATES{id} = d_txt;
+    d_txt(d_txt=='/')='-';
+        
+        
+%     d_txt = ['0',dates{id},'20']; d_txt(d_txt=='/') = '-';
+%     if d_txt(5)=='-'
+%         d_txt = [d_txt(1:3),'0',d_txt(4:end)];
+%     end
     pt = 0;
     try
         Z = readtable(['../COVID-19/csse_covid_19_data/csse_covid_19_daily_reports_us/',d_txt,'.csv']);
@@ -30,7 +38,7 @@ for id = length(dates):-1:1
     i_co = find(strcmp(heads,'Confirmed'));
     i_de = find(strcmp(heads,'Deaths'));
     i_re = find(strcmp(heads,'Recovered'));
-    if pt==1; i_pt = find(strcmp(heads,'People_Tested')); end
+    if pt==1; i_pt = find(strcmp(heads,'People_Tested')|strcmp(heads,'Total_Test_Results')); end
     if id==length(dates)
         i_la = find(strcmp(heads,'Lat'));
         i_lo = find(strcmp(heads,'Long_'));

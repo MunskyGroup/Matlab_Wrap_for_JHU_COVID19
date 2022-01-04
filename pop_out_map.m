@@ -1,7 +1,10 @@
-function [h,cblab,ticklabs,K] = pop_out_map(app,j_time_to_plot,max_j)
+function [h,cblab,ticklabs,K] = pop_out_map(app,j_time_to_plot,max_j,min_j)
 
 if nargin<3
     max_j = j_time_to_plot;
+end
+if nargin<4
+    min_j = j_time_to_plot;
 end
 
 figure(314); clf;
@@ -15,6 +18,7 @@ if app.abs_2.Value
     Lat = app.Lat;
     Long = app.Long;
     countries = app.Countries;
+    statesNames = app.States;
 else
     DATA = app.Pop_Data.DATA;
     DATA_Deaths = app.Pop_Data.DATA_Deaths;
@@ -24,6 +28,7 @@ else
     Lat = app.Pop_Data.Lat;
     Long = app.Pop_Data.Long;
     countries = app.Pop_Data.Country_Names;
+    statesNames = app.Pop_Data.State;
 end
 
 switch app.map_what.Value
@@ -43,6 +48,45 @@ end
 J = ones(size(DATA,1),1,'logical');
 switch app.RegionDropDown.Value
     case {'World'}
+    case {'US'}
+        J = strcmp(countries,'US')&~strcmp(statesNames,'Alaska')...
+            &~strcmp(statesNames,'Puerto Rico')...
+            &~strcmp(statesNames,'Hawaii')...
+            &~contains(statesNames,'Princess');
+    case {'Europe'}
+end
+
+DATA = DATA(J,:);
+% Lat = Lat(J);
+% Long = Long(J);
+
+% Bin data for plotting
+cmap = colormap('jet');
+DD = DATA(:,min_j:max_j);
+DD(DD==0)=min(DD(DD~=0));
+mnI = log2(min(DD(:)));
+mxI = log2(max(DD(:)));
+DD = DATA(:,j_time_to_plot);
+l2D = log2(DD);
+I = floor(12*(l2D-mnI)/(mxI-mnI));
+K = 0:12;
+KK = floor(linspace(1,size(cmap,1),13));
+if app.abs_2.Value
+    ticklabs = round(2.^(mnI+K.*(mxI-mnI)/12),-2);
+    cblab = 'Size of infection';
+else
+    ticklabs = round(2.^(mnI+K.*(mxI-mnI)/12),0);
+    cblab = 'Size of infection per 10k';
+end
+
+COLS = repmat(cmap(KK(1),:),length(I),1);
+for i=1:max(I)
+    COLS(I==i,:) = repmat(cmap(KK(i),:),sum(I==i),1);
+end
+
+% Create base map for World, US, or Europe
+switch app.RegionDropDown.Value
+    case {'World'}
         h = worldmap('World');  % Store the output handle!
         load coastlines
         plotm(coastlat, coastlon);
@@ -51,11 +95,15 @@ switch app.RegionDropDown.Value
         h = usamap('conus');
         states = shaperead('usastatelo', 'UseGeoCoords', true,...
             'Selector',...
-            {@(name) ~any(strcmp(name,{'Alaska','Hawaii'})), 'Name'});
-        rng(0);
+            {@(name) any(strcmp(name,statesNames(J))), 'Name'});
+        INDS = zeros(size(states,1),1);
+        for jS = 1:size(states,1)
+            INDS(jS) = find(strcmp(statesNames(J),states(jS).Name));
+        end
+        
         faceColors = makesymbolspec('Polygon',...
             {'INDEX', [1 numel(states)], 'FaceColor', ...
-            polcmap(numel(states))}); %NOTE - colors are random
+            COLS(INDS,:)}); %NOTE - colors are random
         geoshow(h, states, 'DisplayType', 'polygon', ...
             'SymbolSpec', faceColors)
         J = strcmp(countries,'US')&~strcmp(countries,'Alaska')&~strcmp(countries,'Hawaii')...
@@ -67,46 +115,3 @@ switch app.RegionDropDown.Value
         geoshow('landareas.shp', 'FaceColor', [0.15 0.5 0.15])
 end
 
-DATA = DATA(J,:);
-Lat = Lat(J);
-Long = Long(J);
-
-% Extrapolate for future dates.
-Nt = size(DATA,2);
-if max_j>Nt
-    nf = 5;
-    [gr_rate,kept_states] = Make_Growth_Rate_Table(app,nf,DATA);
-    for jt = Nt+1:max_j
-        DATA(kept_states,jt) = DATA(kept_states,jt-1).*(2.^(1./gr_rate));
-        DATA(~kept_states,jt) = DATA(~kept_states,jt-1);
-    end
-end
-
-% [a,b] = max(DATA(:,end))
-% countries = countries(J);
-% countries(b)
-
-
-% Bin data for plotting
-cmap = colormap('jet');
-if app.abs_2.Value
-    I = floor(log2(DATA(:,j_time_to_plot)));
-    mxI = log2(max(DATA(:)));
-    mksize = linspace(4,30,mxI);
-    K = floor(linspace(1,size(cmap,1),floor(log2(max(DATA(:))))));
-    ticklabs = 2.^[1:length(K)];
-    cblab = 'Size of infection';
-else
-    nb = 7;
-    I = floor(log2(DATA(:,j_time_to_plot))+nb);
-    mxI = log2(max(DATA(:)))+nb;
-    mksize = linspace(4,30,mxI);
-    K = floor(linspace(1,size(cmap,1),floor(log2(max(DATA(:)))+nb)));    
-    ticklabs = 2.^([1:length(K)]-nb);
-    cblab = 'Size of infection per 10k';
-end
-
-% Add points for all states/regions
-for i=1:max(I)
-    geoshow(Lat(I==i),Long(I==i),'DisplayType', 'Point', 'Marker', 'o', 'Color',cmap(K(i),:),'MarkerFaceColor',cmap(K(i),:),'MarkerSize',mksize(i))
-end

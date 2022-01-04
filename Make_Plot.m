@@ -27,11 +27,12 @@ end
 % First we sort countries/states so that they are in alphabetic order
 app.countries.Value = sort(app.countries.Value);
 app.states.Value = sort(app.states.Value);
-if app.act.Value
-    DATA_all = DATA - DATA_Deaths - DATA_Recov;
-    app.ax_infections.YLabel.String = 'Actively Infected';
-    app.ax_infections.Title.String = 'Actively infected over time';
-elseif app.rec.Value
+% if app.act.Value
+%     DATA_all = DATA - DATA_Deaths - DATA_Recov;
+%     app.ax_infections.YLabel.String = 'Actively Infected';
+%     app.ax_infections.Title.String = 'Actively infected over time';
+% else
+if app.rec.Value
     dr = app.days_rec_inf.Value;
     DATA_all(:,1:dr) = DATA(:,1:dr);
     DATA_all = [DATA_all, DATA(:,dr+1:end) - DATA(:,1:end-dr)]/dr;
@@ -102,29 +103,29 @@ elseif app.specific.Value  % Specific Countries or states.
     end
 end
 
-if app.abs.Value
-    if min(app.inf_vs_t(:,end))<10
-        app.abs_date.Value = 1;
-        app.PeopleDropDown.Items = {'1'};
-    else
-        for i=1:log10(min(app.inf_vs_t(:,end)))
-            app.PeopleDropDown.Items{i} = num2str(10^i);
-        end
-        app.PeopleDropDown.Items = app.PeopleDropDown.Items(1:i);
-        app.PeopleLabel.Text = 'People';
-    end
-else
-    if min(app.inf_vs_t(:,end))<1e-3
-        app.abs_date.Value = 1;
-        app.PeopleDropDown.Items = {'0.001'};
-    else
-        for i=-3:log10(min(app.inf_vs_t(:,end)))
-            app.PeopleDropDown.Items{i+4} = num2str(10^i);
-        end
-        app.PeopleDropDown.Items = app.PeopleDropDown.Items(1:i+4);
-        app.PeopleLabel.Text = 'per 10k People';
-    end
-end
+% if app.abs.Value
+%     if min(app.inf_vs_t(:,end))<10
+%         app.abs_date.Value = 1;
+%         app.PeopleDropDown.Items = {'1'};
+%     else
+%         for i=1:log10(min(app.inf_vs_t(:,end)))
+%             app.PeopleDropDown.Items{i} = num2str(10^i);
+%         end
+%         app.PeopleDropDown.Items = app.PeopleDropDown.Items(1:i);
+%         app.PeopleLabel.Text = 'People';
+%     end
+% else
+%     if min(app.inf_vs_t(:,end))<1e-3
+%         app.abs_date.Value = 1;
+%         app.PeopleDropDown.Items = {'0.001'};
+%     else
+%         for i=-3:log10(min(app.inf_vs_t(:,end)))
+%             app.PeopleDropDown.Items{i+4} = num2str(10^i);
+%         end
+%         app.PeopleDropDown.Items = app.PeopleDropDown.Items(1:i+4);
+%         app.PeopleLabel.Text = 'per 10k People';
+%     end
+% end
 
 % Clear and make new plots of data versus time.
 hold(app.ax_infections,'off'); hold(app.ax_deaths,'off')
@@ -151,3 +152,18 @@ else
     set(app.ax_infections,'yscale','log');
     set(app.ax_deaths,'yscale','log');
 end
+
+% Put dates on x-axis
+jMIN = find(strcmp(app.RealDates,char(app.InitlalDateForPlotDatePicker.Value)));
+if isempty(jMIN); jMIN=1; end
+jMIN = max(1,jMIN);
+
+app.ax_infections.XTickMode = 'auto';
+app.ax_infections.XLim = [jMIN,size(app.inf_vs_t,2)];
+app.ax_infections.XTick(end) = size(app.inf_vs_t,2);
+app.ax_infections.XTickLabel = {app.RealDates{app.ax_infections.XTick}};
+app.ax_infections.XTickLabelRotation = 30;
+app.ax_deaths.XLim = [jMIN,size(app.inf_vs_t,2)];
+app.ax_deaths.XTick(end) = size(app.inf_vs_t,2);
+app.ax_deaths.XTickLabel = {app.RealDates{app.ax_infections.XTick}};
+app.ax_deaths.XTickLabelRotation = 30;
